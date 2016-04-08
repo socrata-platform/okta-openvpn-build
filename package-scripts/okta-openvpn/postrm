@@ -1,0 +1,9 @@
+#!/bin/sh
+#
+# Perform necessary okta-openvpn removal steps
+# after package is uninstalled.
+#
+
+echo "okta-openvpn has been uninstalled!"
+
+exit 0
