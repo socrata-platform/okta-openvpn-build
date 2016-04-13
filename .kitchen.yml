@@ -1,42 +1,24 @@
+<% require_relative 'libraries/helpers' %>
+
 driver:
   name: vagrant
-  forward_agent: yes
-  customize:
-    cpus: 2
-    memory: 2048
-  synced_folders:
-    - ['.', '/home/vagrant/okta-openvpn']
 
 provisioner:
   name: chef_zero
-  require_chef_omnibus: 12.4.1
 
 platforms:
-  - name: centos-7.1
-    run_list: yum-epel::default
-  - name: centos-6.6
-    run_list: yum-epel::default
-  - name: centos-5.11
-    run_list: yum-epel::default
-  - name: debian-7.8
-    run_list: apt::default
-  - name: debian-6.0.10
-    run_list: apt::default
-  - name: freebsd-10.1
-    run_list: freebsd::portsnap
-  - name: freebsd-9.3
-    run_list:
-      - freebsd::portsnap
-      - freebsd::pkgng
   - name: ubuntu-14.04
-    run_list: apt::default
-  - name: ubuntu-12.04
-    run_list: apt::default
 
 suites:
   - name: default
-    run_list: omnibus::default
+    run_list: okta-openvpn-build::default
     attributes:
+      okta_openvpn_build:
+        packagecloud_token: <%= ENV['PACKAGECLOUD_TOKEN'] || 'test' %>
+        publish_artifacts: <%= ENV['TRAVIS_PULL_REQUEST'] == 'false' ? true : false %>
+        build_version: <%= OktaOpenvpnBuild::Helpers.version %>
+        build_revision: <%= OktaOpenvpnBuild::Helpers.revision %>
+        source_url: <%= OktaOpenvpnBuild::Helpers.source_url %>
       omnibus:
         build_user:          vagrant
         build_user_group:    vagrant

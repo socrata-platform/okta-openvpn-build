@@ -1,3 +1,4 @@
+# Encoding: UTF-8
 #
 # This file is used to configure the okta-openvpn project. It contains
 # some minimal configuration examples for working with Omnibus. For a full list

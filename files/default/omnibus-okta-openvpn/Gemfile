@@ -1,0 +1,8 @@
+# Encoding: UTF-8
+
+source 'https://rubygems.org'
+
+group :build do
+  gem 'omnibus'
+  gem 'omnibus-software', github: 'chef/omnibus-software'
+end

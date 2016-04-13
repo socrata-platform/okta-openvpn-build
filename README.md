@@ -1,10 +1,23 @@
-okta-openvpn Omnibus project
-============================
-This project creates full-stack platform-specific packages for
-`okta-openvpn`!
+Okta-OpenVPN Build Project
+==========================
+[![Build Status](https://img.shields.io/travis/socrata-platform/okta-openvpn-build.svg)][travis]
+[![Coverage Status](https://img.shields.io/coveralls/socrata-platform/okta-openvpn-build.svg)][coveralls]
 
-Installation
+[travis]: https://travis-ci.org/socrata-platform/okta-openvpn-build
+[coveralls]: https://coveralls.io/r/socrata-platform/okta-openvpn-build
+
+A project for package the Okta OpenVPN plugin using Omnibus.
+
+This project currently builds for Ubuntu 14.04 only. More platforms may be added
+if time allows.
+
+Requirements
 ------------
+
+This project is distributed as a Chef cookbook that contains an Omnibus project.
+This allows for automated builds in Vagrant or Docker environments using Test
+Kitchen.
+
 You must have a sane Ruby 2.0.0+ environment with Bundler installed. Ensure all
 the required gems are installed:
 
@@ -14,107 +27,50 @@ $ bundle install --binstubs
 
 Usage
 -----
-### Build
 
-You create a platform-specific package using the `build project` command:
+The included Test Kitchen config handles all the builds automatically for the
+supported platforms. Normally, these builds will be kicked off and run on the
+CI server, which will use Test Kitchen to assemble new packages, install them,
+verify them, and publish them to PackageCloud.io.
 
-```shell
-$ bin/omnibus build okta-openvpn
-```
+Should the need arise, `omnibus` commands can still be run from the project
+directory in `files/default/omnibus-okta-openvpn`.
 
-The platform/architecture type of the package created will match the platform
-where the `build project` command is invoked. For example, running this command
-on a MacBook Pro will generate a Mac OS X package. After the build completes
-packages will be available in the `pkg/` folder.
+Recipes
+-------
 
-### Clean
+Libraries
+---------
 
-You can clean up all temporary files generated during the build process with
-the `clean` command:
+Attributes
+----------
 
-```shell
-$ bin/omnibus clean okta-openvpn
-```
+Contributing
+------------
 
-Adding the `--purge` purge option removes __ALL__ files generated during the
-build including the project install directory (`/opt/okta-openvpn`) and
-the package cache directory (`/var/cache/omnibus/pkg`):
+Pull requests are welcome!
 
-```shell
-$ bin/omnibus clean okta-openvpn --purge
-```
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Add tests for the new feature; ensure they pass (`rake`)
+4. Commit your changes (`git commit -am 'Add some feature'`)
+5. Push to the branch (`git push origin my-new-feature`)
+6. Create a new Pull Request
 
-### Publish
+License & Authors
+=================
+- Author: Jonathan Hartman <jonathan.hartman@socrata.com>
 
-Omnibus has a built-in mechanism for releasing to a variety of "backends", such
-as Amazon S3. You must set the proper credentials in your `omnibus.rb` config
-file or specify them via the command line.
+Copyright 2016, Socrata, Inc.
 
-```shell
-$ bin/omnibus publish path/to/*.deb --backend s3
-```
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-### Help
+    http://www.apache.org/licenses/LICENSE-2.0
 
-Full help for the Omnibus command line interface can be accessed with the
-`help` command:
-
-```shell
-$ bin/omnibus help
-```
-
-Version Manifest
-----------------
-
-Git-based software definitions may specify branches as their
-default_version. In this case, the exact git revision to use will be
-determined at build-time unless a project override (see below) or
-external version manifest is used.  To generate a version manifest use
-the `omnibus manifest` command:
-
-```
-omnibus manifest PROJECT -l warn
-```
-
-This will output a JSON-formatted manifest containing the resolved
-version of every software definition.
-
-
-Kitchen-based Build Environment
--------------------------------
-Every Omnibus project ships will a project-specific
-[Berksfile](http://berkshelf.com/) that will allow you to build your omnibus projects on all of the projects listed
-in the `.kitchen.yml`. You can add/remove additional platforms as needed by
-changing the list found in the `.kitchen.yml` `platforms` YAML stanza.
-
-This build environment is designed to get you up-and-running quickly. However,
-there is nothing that restricts you to building on other platforms. Simply use
-the [omnibus cookbook](https://github.com/opscode-cookbooks/omnibus) to setup
-your desired platform and execute the build steps listed above.
-
-The default build environment requires Test Kitchen and VirtualBox for local
-development. Test Kitchen also exposes the ability to provision instances using
-various cloud providers like AWS, DigitalOcean, or OpenStack. For more
-information, please see the [Test Kitchen documentation](http://kitchen.ci).
-
-Once you have tweaked your `.kitchen.yml` (or `.kitchen.local.yml`) to your
-liking, you can bring up an individual build environment using the `kitchen`
-command.
-
-```shell
-$ bin/kitchen converge ubuntu-1204
-```
-
-Then login to the instance and build the project as described in the Usage
-section:
-
-```shell
-$ bundle exec kitchen login ubuntu-1204
-[vagrant@ubuntu...] $ cd okta-openvpn
-[vagrant@ubuntu...] $ bundle install
-[vagrant@ubuntu...] $ ...
-[vagrant@ubuntu...] $ bin/omnibus build okta-openvpn
-```
-
-For a complete list of all commands and platforms, run `kitchen list` or
-`kitchen help`.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
