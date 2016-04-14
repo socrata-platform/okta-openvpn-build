@@ -45,25 +45,29 @@ class OktaOpenvpn < FPM::Cookery::Recipe
   depends %w(python python-urllib3 python-m2crypto)
 
   #
-  # Modify okta_openvpn.py to import our Omnibussed copy of the Certifi module
-  # instead of looking for it in the normal Python paths.
+  # Modify okta_openvpn.py to import our Omnibussed copies of the three Okta
+  # plugin dependencies instead of looking in the normal Python paths.
   #
   def build
     inline_replace 'okta_openvpn.py' do |s|
-      s.gsub!(/^import certifi$/, 'from okta_openvpn import certifi')
+      %w(M2Crypto urllib3 certifi).each do |m|
+        s.gsub!(/^import #{m}$/, "from okta_openvpn import #{m}")
+      end
     end
     make
   end
 
   #
-  # Install the Certifi module in with the Okta plugin. There is no
-  # python-certifi package in Ubuntu prior to 16.04 but we want to maintain as
-  # few of our own packages as we have to.
+  # Install the three Python dependencies in with the Okta plugin. Certifi
+  # isn't packaged for Ubuntu prior to 16.04 and the others are out of date
+  # compared to what the Okta plugin asks for.
   #
   def install
     make :install, DESTDIR: destdir
     pluginsdir = "#{destdir}/usr/lib/openvpn/plugins"
-    safesystem("pip install --no-deps -U certifi -t #{pluginsdir}/okta_openvpn")
+    %w(M2Crypto urllib3 certifi).each do |m|
+      safesystem("pip install --no-deps -U -t #{pluginsdir}/okta_openvpn #{m}")
+    end
     f = File.open("#{pluginsdir}/okta_openvpn/__init__.py", 'w')
     f.write("__version__ = \"#{version}\"")
     f.close
