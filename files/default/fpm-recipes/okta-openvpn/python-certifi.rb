@@ -35,5 +35,11 @@ class PythonCertifi < FPM::Cookery::PythonRecipe
 
   license 'Apache, version 2.0'
 
-  fpm_attributes[:prefix] = '/usr'
+  build_depends %w(python python-pip)
+
+  depends %w(python)
+
+  cmd = "python -c 'from distutils.sysconfig import get_python_lib; " \
+        "print get_python_lib()'"
+  fpm_attributes[:python_install_lib] = `#{cmd}`
 end

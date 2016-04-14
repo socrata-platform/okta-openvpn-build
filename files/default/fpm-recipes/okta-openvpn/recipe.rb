@@ -40,9 +40,9 @@ class OktaOpenvpn < FPM::Cookery::Recipe
 
   license 'Apache, version 2.0'
 
-  build_depends %w(python-pip python-dev libssl-dev swig)
+  build_depends %w(git python python-pip python-dev libssl-dev swig)
 
-  depends %w(python-urllib3 python-m2crypto python-certifi)
+  depends %w(python python-urllib3 python-m2crypto python-certifi)
 
   chain_package true
   chain_recipes 'python-certifi'
