@@ -22,7 +22,7 @@ package 'okta-openvpn' do
   action :remove
 end
 
-include_recipe 'apt' if node['platform_family'] == 'debian'
+apt_update 'default' if node['platform_family'] == 'debian'
 include_recipe 'build-essential'
 
 chef_gem 'fpm-cookery' do

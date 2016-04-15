@@ -11,7 +11,6 @@ version '0.1.0'
 source_url 'https://github.com/socrata-platform/okta-openvpn-build'
 issues_url 'https://github.com/socrata-platform/okta-openvpn-build/issues'
 
-depends 'apt'
 depends 'build-essential'
 
 supports 'ubuntu'

@@ -50,7 +50,7 @@ describe 'okta-openvpn-build::_build' do
 
   shared_examples_for 'a Ubuntu platform' do
     it 'ensures the APT cache is refreshed' do
-      expect(chef_run).to include_recipe('apt')
+      expect(chef_run).to periodic_apt_update('default')
     end
   end
 
