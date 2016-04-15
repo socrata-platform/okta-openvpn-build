@@ -12,5 +12,6 @@ source_url 'https://github.com/socrata-platform/okta-openvpn-build'
 issues_url 'https://github.com/socrata-platform/okta-openvpn-build/issues'
 
 depends 'build-essential'
+depends 'yum-epel'
 
 supports 'ubuntu'
