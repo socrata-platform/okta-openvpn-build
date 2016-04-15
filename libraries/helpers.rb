@@ -182,6 +182,7 @@ module OktaOpenvpnBuild
       #
       def client
         @client ||= begin
+          require 'packagecloud'
           creds = Packagecloud::Credentials.new('socrata-platform', token)
           Packagecloud::Client.new(creds)
         end
