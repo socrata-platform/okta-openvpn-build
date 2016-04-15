@@ -1,7 +1,6 @@
 # Encoding: UTF-8
 #
 # Project Name:: okta-openvpn
-# Software Name:: python-pip
 #
 # Copyright 2016, Socrata, Inc.
 #
@@ -18,20 +17,20 @@
 # limitations under the License.
 #
 
-name 'python-pip'
-default_version '8.1.1'
+name 'okta-openvpn'
+maintainer 'Jonathan Hartman <jonathan.hartman@socrata.com>'
+homepage 'https://github.com/socrata-platform/okta-openvpn-build'
 
-dependency 'python'
-dependency 'setuptools'
+# Defaults to C:/okta-openvpn on Windows
+# and /opt/okta-openvpn on all other platforms
+install_dir "#{default_root}/#{name}"
 
-source url: "https://pypi.python.org/packages/source/p/pip/pip-#{version}.tar.gz",
-       md5: '6b86f11841e89c8241d689956ba99ed7'
+build_version ENV['BUILD_VERSION']
+build_iteration ENV['BUILD_REVISION']
 
-relative_path "pip-#{version}"
+dependency 'preparation'
+dependency 'okta-openvpn'
+dependency 'version-manifest'
 
-build do
-  env = with_standard_compiler_flags(with_embedded_path)
-
-  command "#{install_dir}/embedded/bin/python setup.py install " \
-          "--prefix=#{install_dir}/embedded", env: env
-end
+exclude '**/.git'
+exclude '**/bundler/git'

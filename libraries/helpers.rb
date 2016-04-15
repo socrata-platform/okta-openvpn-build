@@ -1,0 +1,178 @@
+# Encoding: UTF-8
+#
+# Cookbook Name:: okta-openvpn-build
+# Library:: helpers
+#
+# Copyright 2016, Socrata, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+require 'net/http'
+require 'json'
+require 'ohai'
+
+module OktaOpenvpnBuild
+  # Helper methods that are shared, to be used in both the individual builder
+  # servers as well as the central instance coordinating them.
+  #
+  # @author Jonathan Hartman <jonathan.hartman@socrata.com>
+  class Helpers
+    class << self
+      attr_reader :token
+
+      #
+      # Accept a PackageCloud API token and optional node object to save in
+      # the class-level configuration. If no node object is provided, Ohai
+      # will be called directly.
+      #
+      # @param token [String] a PackageCloud.io API token
+      #
+      def configure!(token, node)
+        require 'packagecloud'
+        @token = token
+        @node = node
+        self
+      end
+
+      #
+      # Read in a package file and upload it to PackageCloud.
+      #
+      def push_package!
+        require 'packagecloud'
+        pkg = Packagecloud::Package.new(open(package_file, distro_id))
+        client.put_package('okta-openvpn', pkg)
+      end
+
+      #
+      # Return the platform-dependent path to the package artifact
+      #
+      # @return [String] a package file path
+      #
+      def package_file
+        File.join('/tmp/fpm-recipes/okta-openvpn/pkg',
+                  case node['platform_family']
+                  when 'debian'
+                    "okta-openvpn_#{version}-#{revision}_amd64.deb"
+                  when 'rhel'
+                    "okta-openvpn-#{version}-#{revision}.x86_64.rpm"
+                  end)
+      end
+
+      #
+      # Return the platform-dependent distro ID for use with PackageCloud.
+      #
+      # @return [String] a distro ID
+      #
+      def distro_id
+        case node['platform_family']
+        when 'debian'
+          "#{node['platform']}/#{node['lsb']['codename']}"
+        when 'rhel'
+          "el/#{node['platform_version'].to_i}"
+        end
+      end
+
+      #
+      # Hit the PackageCloud API to find the most recent revision of this
+      # version of the package. If this version has already been released,
+      # return the next revision number. If this version is not released,
+      # return 1. If no API token is configured and we can't use PackageCloud,
+      # assume it's a test being run and return 1.
+      #
+      # @return [Fixnum] a revision number
+      #
+      def revision
+        return 1 if token.nil? || packages.nil? || packages.empty?
+        packages.sort_by { |p| p['release'] }.last['release'].to_i + 1
+      end
+
+      #
+      # Return a list of packages in PackageCloud that match the desired version
+      # number.
+      #
+      # @return [Array<Hash>] an array of packages
+      #
+      def packages
+        @packages ||= begin
+          client.list_packages('okta-openvpn').response.select do |p|
+            p['version'] == version
+          end
+        end
+      end
+
+      #
+      # Return the source URL of a tarball of the most recent version of the
+      # Okta plugin, determined based on the latest GitHub tag's tarball URL.
+      #
+      # @return [String] a download URL
+      #
+      def source_url
+        tag['tarball_url']
+      end
+
+      #
+      # Return the most recent released version of the Okta plugin,
+      # determined based on the latest GitHub tag with the 'v' stripped off.
+      #
+      # @return [String] a version string
+      #
+      def version
+        tag['name'].gsub(/^v/, '')
+      end
+
+      #
+      # Hit the GitHub API and find the most recent tagged version of the Okta
+      # plugin, returning the hash representation of that tag. Save the tag
+      # in a class variable so there's no race condition when a new version
+      # is released while a build is running.
+      #
+      # @return [Hash] the properties for the latest tag
+      #
+      def tag
+        @tag ||= JSON.parse(
+          Net::HTTP.get(
+            URI('https://api.github.com/repos/okta/okta-openvpn/tags')
+          )
+        ).first
+      end
+
+      #
+      # Load up Ohai and generate a node object so we know the platform
+      # information needed to manage packages.
+      #
+      # @return [Ohai::System] platform information addressable as a hash
+      #
+      def node
+        @node ||= begin
+                    s = Ohai::System.new
+                    s.all_plugins
+                    s
+                  end
+      end
+
+      #
+      # Use the saved PackageCloud API token to authenticate with their API and
+      # return a client.
+      #
+      # @return [Packagecloud::Client] a new client object
+      #
+      def client
+        @client ||= begin
+          creds = Packagecloud::Credentials.new('socrata-platform', token)
+          Packagecloud::Client.new(creds)
+        end
+      end
+    end
+  end
+end

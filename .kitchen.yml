@@ -1,4 +1,7 @@
-<% require_relative 'libraries/helpers' %>
+<%
+require_relative 'libraries/helpers'
+OktaOpenvpnBuild::Helpers.configure!(ENV['PACKAGECLOUD_TOKEN'], nil)
+%>
 
 driver:
   name: vagrant
@@ -14,13 +17,7 @@ suites:
     run_list: okta-openvpn-build::default
     attributes:
       okta_openvpn_build:
+        version: <%= OktaOpenvpnBuild::Helpers.version %>
+        revision: <%= OktaOpenvpnBuild::Helpers.revision %>
         packagecloud_token: <%= ENV['PACKAGECLOUD_TOKEN'] || 'test' %>
         publish_artifacts: <%= ENV['TRAVIS_PULL_REQUEST'] == 'false' ? true : false %>
-        build_version: <%= OktaOpenvpnBuild::Helpers.version %>
-        build_revision: <%= OktaOpenvpnBuild::Helpers.revision %>
-        source_url: <%= OktaOpenvpnBuild::Helpers.source_url %>
-      omnibus:
-        build_user:          vagrant
-        build_user_group:    vagrant
-        build_user_password: vagrant
-        install_dir:         /opt/okta-openvpn

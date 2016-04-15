@@ -13,8 +13,10 @@ describe 'okta-openvpn::app' do
     /etc/openvpn/okta_openvpn.ini
     /usr/lib/openvpn/plugins/okta_openvpn.py
   ).each do |f|
-    it 'exists' do
-      expect(subject).to be_file
+    describe file(f) do
+      it 'exists' do
+        expect(subject).to be_file
+      end
     end
   end
 

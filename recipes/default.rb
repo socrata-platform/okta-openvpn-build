@@ -1,6 +1,7 @@
 # Encoding: UTF-8
 #
-# Project Name:: okta-openvpn
+# Cookbook Name:: okta-openvpn-build
+# Recipe:: default
 #
 # Copyright 2016, Socrata, Inc.
 #
@@ -17,20 +18,10 @@
 # limitations under the License.
 #
 
-name 'okta-openvpn'
-maintainer 'Jonathan Hartman <jonathan.hartman@socrata.com>'
-homepage "https://github.com/socrata-platform/okta-openvpn-build"
+OktaOpenvpnBuild::Helpers.configure!(
+  node['okta_openvpn_build']['packagecloud_token'], node
+)
 
-# Defaults to C:/okta-openvpn on Windows
-# and /opt/okta-openvpn on all other platforms
-install_dir "#{default_root}/#{name}"
-
-build_version ENV['BUILD_VERSION']
-build_iteration ENV['BUILD_REVISION']
-
-dependency 'preparation'
-dependency 'okta-openvpn'
-dependency 'version-manifest'
-
-exclude '**/.git'
-exclude '**/bundler/git'
+include_recipe "#{cookbook_name}::_build"
+include_recipe "#{cookbook_name}::_verify"
+include_recipe "#{cookbook_name}::_deploy"
