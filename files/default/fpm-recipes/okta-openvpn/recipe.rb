@@ -42,7 +42,7 @@ class OktaOpenvpn < FPM::Cookery::Recipe
 
   build_depends %w(git python python-pip python-dev libssl-dev swig)
 
-  depends %w(python python-urllib3 python-m2crypto)
+  depends %w(python)
 
   #
   # Modify okta_openvpn.py to import our Omnibussed copies of the three Okta
