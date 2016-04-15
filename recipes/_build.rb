@@ -1,7 +1,7 @@
 # Encoding: UTF-8
 #
-# Project Name:: okta-openvpn
-# Software Name:: python-pip
+# Cookbook Name:: okta-openvpn-build
+# Recipe:: _build
 #
 # Copyright 2016, Socrata, Inc.
 #
@@ -18,20 +18,28 @@
 # limitations under the License.
 #
 
-name 'python-pip'
-default_version '8.1.1'
+package 'okta-openvpn' do
+  action :remove
+end
 
-dependency 'python'
-dependency 'setuptools'
+apt_update 'default' if node['platform_family'] == 'debian'
+include_recipe 'build-essential'
 
-source url: "https://pypi.python.org/packages/source/p/pip/pip-#{version}.tar.gz",
-       md5: '6b86f11841e89c8241d689956ba99ed7'
+chef_gem 'fpm-cookery' do
+  compile_time false
+end
 
-relative_path "pip-#{version}"
+remote_directory '/tmp/fpm-recipes'
 
-build do
-  env = with_standard_compiler_flags(with_embedded_path)
-
-  command "#{install_dir}/embedded/bin/python setup.py install " \
-          "--prefix=#{install_dir}/embedded", env: env
+bash 'Run the FPM cook' do
+  cwd '/tmp/fpm-recipes/okta-openvpn'
+  environment(
+    'BUILD_VERSION' => node['okta_openvpn_build']['version'],
+    'BUILD_REVISION' => node['okta_openvpn_build']['revision'].to_s
+  )
+  code <<-EOH.gsub(/^ {4}/, '')
+    BIN=/opt/chef/embedded/bin/fpm-cook
+    $BIN clean
+    $BIN package
+  EOH
 end

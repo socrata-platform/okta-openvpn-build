@@ -19,7 +19,7 @@
 
 name 'okta-openvpn'
 maintainer 'Jonathan Hartman <jonathan.hartman@socrata.com>'
-homepage "https://github.com/socrata-platform/okta-openvpn-build"
+homepage 'https://github.com/socrata-platform/okta-openvpn-build'
 
 # Defaults to C:/okta-openvpn on Windows
 # and /opt/okta-openvpn on all other platforms
