@@ -20,7 +20,7 @@ end
 
 group :build do
   gem 'fpm-cookery'
-  gem 'packagecloud-ruby'
+  gem 'packagecloud-ruby', '~> 1.0'
   gem 'chef', '>= 12.9'
   gem 'berkshelf'
   gem 'test-kitchen'

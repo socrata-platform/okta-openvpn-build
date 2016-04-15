@@ -38,15 +38,14 @@ describe OktaOpenvpnBuild::Helpers do
     before(:each) do
       allow(described_class).to receive(:package_file).and_return(package_file)
       allow(described_class).to receive(:distro_id).and_return(distro_id)
-      allow(described_class).to receive(:open).with(package_file)
-        .and_return(open)
-      allow(Packagecloud::Package).to receive(:new).with(open, distro_id)
+      allow(Packagecloud::Package).to receive(:new).with(file: package_file)
         .and_return(package)
       allow(described_class).to receive(:client).and_return(client)
     end
 
     it 'uploads the proper package artifact' do
-      expect(client).to receive(:put_package).with('okta-openvpn', package)
+      expect(client).to receive(:put_package)
+        .with('okta-openvpn', package, distro_id)
       described_class.push_package!
     end
   end
