@@ -38,9 +38,9 @@ describe OktaOpenvpnBuild::Helpers do
     before(:each) do
       allow(described_class).to receive(:package_file).and_return(package_file)
       allow(described_class).to receive(:distro_id).and_return(distro_id)
-      allow(described_class).to receive(:open).with(package_file, distro_id)
+      allow(described_class).to receive(:open).with(package_file)
         .and_return(open)
-      allow(Packagecloud::Package).to receive(:new).with(open)
+      allow(Packagecloud::Package).to receive(:new).with(open, distro_id)
         .and_return(package)
       allow(described_class).to receive(:client).and_return(client)
     end

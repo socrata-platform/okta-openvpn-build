@@ -58,7 +58,7 @@ module OktaOpenvpnBuild
       #
       def push_package!
         require 'packagecloud'
-        pkg = Packagecloud::Package.new(open(package_file, distro_id))
+        pkg = Packagecloud::Package.new(open(package_file), distro_id)
         client.put_package('okta-openvpn', pkg)
       end
 
