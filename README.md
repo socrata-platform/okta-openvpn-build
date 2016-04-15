@@ -6,24 +6,17 @@ Okta-OpenVPN Build Project
 [travis]: https://travis-ci.org/socrata-platform/okta-openvpn-build
 [coveralls]: https://coveralls.io/r/socrata-platform/okta-openvpn-build
 
-A project for package the Okta OpenVPN plugin using Omnibus.
+A project for packaging the Okta OpenVPN plugin.
 
 This project currently builds for Ubuntu 14.04 only. More platforms may be added
-if time allows.
+as time allows.
 
 Requirements
 ------------
 
-This project is distributed as a Chef cookbook that contains an Omnibus project.
-This allows for automated builds in Vagrant or Docker environments using Test
-Kitchen.
-
-You must have a sane Ruby 2.0.0+ environment with Bundler installed. Ensure all
-the required gems are installed:
-
-```shell
-$ bundle install --binstubs
-```
+This project is distributed as a Chef cookbook that contains an FPM Cookery
+packaging recipe. This allows for automated builds in Vagrant or Docker
+environments using Test Kitchen.
 
 Usage
 -----
@@ -33,17 +26,43 @@ supported platforms. Normally, these builds will be kicked off and run on the
 CI server, which will use Test Kitchen to assemble new packages, install them,
 verify them, and publish them to PackageCloud.io.
 
-Should the need arise, `omnibus` commands can still be run from the project
-directory in `files/default/omnibus-okta-openvpn`.
+Should the need arise, `fpm-cook` commands can still be run from the project
+directory in `files/default/fpm-recipes`.
 
 Recipes
 -------
 
+***default***
+
+Configures the included helper libraries and ties the below recipes together.
+
+***_build***
+
+Installs build dependencies and runs `fpm-cook`.
+
+***_verify***
+
+Installs the newly-built package and runs a set of ServerSpec tests against it.
+
+***_deploy***
+
+If an attribute is set to enable it, uploads the artifact to PackageCloud.io.
+
 Libraries
 ---------
 
+***helpers***
+
+Helper methods for interacting with the PackageCloud API and handling the
+generated package files.
+
 Attributes
 ----------
+
+***default***
+
+Includes attributes for enabling artifact publishing, a PackageCloud API token,
+and the package version and revision to use in the build.
 
 Contributing
 ------------

@@ -23,6 +23,7 @@ package 'okta-openvpn' do
 end
 
 apt_update 'default' if node['platform_family'] == 'debian'
+include_recipe 'yum-epel' if node['platform_family'] == 'rhel'
 include_recipe 'build-essential'
 
 chef_gem 'fpm-cookery' do
