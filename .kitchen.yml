@@ -1,6 +1,6 @@
 <%
 require_relative 'libraries/helpers'
-OktaOpenvpnBuild::Helpers.configure!(ENV['PACKAGECLOUD_TOKEN'], nil)
+OktaOpenvpnBuild::Helpers.configure!(token: ENV['PACKAGECLOUD_TOKEN'])
 %>
 
 driver:

@@ -19,7 +19,10 @@
 #
 
 OktaOpenvpnBuild::Helpers.configure!(
-  node['okta_openvpn_build']['packagecloud_token'], node
+  token: node['okta_openvpn_build']['packagecloud_token'],
+  node: node,
+  version: node['okta_openvpn_build']['version'],
+  revision: node['okta_openvpn_build']['revision']
 )
 
 include_recipe "#{cookbook_name}::_build"

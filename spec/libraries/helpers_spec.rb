@@ -6,18 +6,25 @@ require_relative '../../libraries/helpers'
 
 describe OktaOpenvpnBuild::Helpers do
   describe '.configure!' do
-    let(:token) { 'abc123' }
-    let(:node) { 'anode' }
-    let(:configured_class) do
-      described_class.configure!(token, node)
+    let(:config) do
+      { token: 'abc123', node: 'anode', version: '1.2.3', revision: 4 }
     end
+    let(:configured_class) { described_class.configure!(config) }
 
     it 'saves the PackageCloud token' do
-      expect(configured_class.token).to eq(token)
+      expect(configured_class.token).to eq('abc123')
     end
 
     it 'saves the node object' do
       expect(configured_class.node).to eq('anode')
+    end
+
+    it 'saves the version' do
+      expect(configured_class.version).to eq('1.2.3')
+    end
+
+    it 'saves the revision' do
+      expect(configured_class.revision).to eq(4)
     end
   end
 
@@ -143,6 +150,7 @@ describe OktaOpenvpnBuild::Helpers do
     let(:token) { nil }
 
     before(:each) do
+      described_class.configure!
       %i(token packages).each do |i|
         allow(described_class).to receive(i).and_return(send(i))
       end
@@ -250,7 +258,6 @@ describe OktaOpenvpnBuild::Helpers do
     let(:system) { double }
 
     before(:each) do
-      described_class.configure!(nil, nil)
       allow(Ohai::System).to receive(:new).and_return(system)
     end
 

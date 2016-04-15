@@ -32,16 +32,24 @@ module OktaOpenvpnBuild
       attr_reader :token
 
       #
-      # Accept a PackageCloud API token and optional node object to save in
-      # the class-level configuration. If no node object is provided, Ohai
-      # will be called directly.
+      # Store configuration information into class variables for later use.
+      # Options that can be passed in are:
       #
-      # @param token [String] a PackageCloud.io API token
+      #   * token - A PackageCloud API token (required for some functions)
+      #   * node - A Chef node object with platform info (will be grabbed
+      #     from Ohai if not provided)
+      #   * version - The version of the package to build (will be pulled from
+      #     the project's GitHub repo if not provided)
+      #   * revision - The revision of the package to build (will be generated
+      #     based on the current repo contents if not provided)
       #
-      def configure!(token, node)
-        require 'packagecloud'
-        @token = token
-        @node = node
+      # @param config [Hash] a set of config options
+      #
+      def configure!(config = {})
+        @token = config[:token]
+        @node = config[:node]
+        @version = config[:version]
+        @revision = config[:revision]
         self
       end
 
@@ -84,17 +92,22 @@ module OktaOpenvpnBuild
       end
 
       #
-      # Hit the PackageCloud API to find the most recent revision of this
-      # version of the package. If this version has already been released,
-      # return the next revision number. If this version is not released,
-      # return 1. If no API token is configured and we can't use PackageCloud,
-      # assume it's a test being run and return 1.
+      # If no version has yet been configured:
+      #
+      #   * Return 1 if there's also no PackageCloud API token
+      #   * Return 1 if this version doesn't exist in PackageCloud yet
+      #   * Return n + 1 where n is the most recent release
       #
       # @return [Fixnum] a revision number
       #
       def revision
-        return 1 if token.nil? || packages.nil? || packages.empty?
-        packages.sort_by { |p| p['release'] }.last['release'].to_i + 1
+        @revision ||= begin
+          if token.nil? || packages.nil? || packages.empty?
+            1
+          else
+            packages.sort_by { |p| p['release'] }.last['release'].to_i + 1
+          end
+        end
       end
 
       #
@@ -118,17 +131,17 @@ module OktaOpenvpnBuild
       # @return [String] a download URL
       #
       def source_url
-        tag['tarball_url']
+        @source_url ||= tag['tarball_url']
       end
 
       #
-      # Return the most recent released version of the Okta plugin,
-      # determined based on the latest GitHub tag with the 'v' stripped off.
+      # If no version has yet been configured, find the most recent release in
+      # in the project's GitHub repo.
       #
       # @return [String] a version string
       #
       def version
-        tag['name'].gsub(/^v/, '')
+        @version ||= tag['name'].gsub(/^v/, '')
       end
 
       #
