@@ -8,8 +8,8 @@ Okta-OpenVPN Build Project
 
 A project for packaging the Okta OpenVPN plugin.
 
-This project currently builds for Ubuntu 14.04 only. More platforms may be added
-as time allows.
+This project currently builds packages for Ubuntu 16.04/14.04 and
+RHEL/CentOS/etc. 7.
 
 Requirements
 ------------
