@@ -40,9 +40,18 @@ class OktaOpenvpn < FPM::Cookery::Recipe
 
   license 'Apache, version 2.0'
 
-  build_depends %w(git python python-pip python-dev libssl-dev swig)
+  build_deps = %w(git python python-setuptools python-pip swig)
+  deps = %w(python)
 
-  depends %w(python)
+  platforms [:debian, :ubuntu] do
+    build_depends build_deps + %w(python-dev libssl-dev)
+    depends deps
+  end
+
+  platforms [:redhat, :centos, :scientific] do
+    build_depends build_deps + %w(python-devel openssl-devel rpm-build)
+    depends deps
+  end
 
   #
   # Modify okta_openvpn.py to import our Omnibussed copies of the three Okta
@@ -66,7 +75,8 @@ class OktaOpenvpn < FPM::Cookery::Recipe
     make :install, DESTDIR: destdir
     pluginsdir = "#{destdir}/usr/lib/openvpn/plugins"
     %w(M2Crypto urllib3 certifi).each do |m|
-      safesystem("pip install --no-deps -U -t #{pluginsdir}/okta_openvpn #{m}")
+      safesystem("pip install --no-deps -U -t #{pluginsdir}/okta_openvpn " \
+                 "--install-option='--install-lib=$base/lib/python' #{m}")
     end
     f = File.open("#{pluginsdir}/okta_openvpn/__init__.py", 'w')
     f.write("__version__ = \"#{version}\"")
