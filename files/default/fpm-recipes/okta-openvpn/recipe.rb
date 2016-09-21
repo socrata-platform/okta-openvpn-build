@@ -77,7 +77,7 @@ class OktaOpenvpn < FPM::Cookery::Recipe
   def install
     make :install, DESTDIR: destdir
     pluginsdir = "#{destdir}/usr/lib/openvpn/plugins"
-    %w(M2Crypto urllib3 certifi).each do |m|
+    %w(typing M2Crypto urllib3 certifi).each do |m|
       safesystem("pip install --no-deps -U -t #{pluginsdir}/okta_openvpn " \
                  "--install-option='--install-lib=$base/lib/python' #{m}")
     end
