@@ -30,6 +30,23 @@ chef_gem 'fpm-cookery' do
   compile_time false
 end
 
+# TODO: FPM Cookery's integration with Puppet to install the dependencies is
+# broken in Ruby 2.2+. See https://github.com/bernd/fpm-cookery/issues/154.
+deps = %w(
+  git
+  python
+  python-setuptools
+  python-pip
+  swig
+)
+deps += case node['platform_family']
+        when 'debian'
+          %w(python-dev libssl-dev)
+        when 'rhel'
+          %w(python-devel openssl-devel rpm-build)
+        end
+deps.each { |d| package d }
+
 remote_directory '/tmp/fpm-recipes'
 
 bash 'Run the FPM cook' do

@@ -59,9 +59,12 @@ class OktaOpenvpn < FPM::Cookery::Recipe
   #
   def build
     inline_replace 'okta_openvpn.py' do |s|
-      %w(M2Crypto urllib3 certifi).each do |m|
-        s.gsub!(/^import #{m}$/, "from okta_openvpn import #{m}")
-      end
+      s.gsub!(
+        /^import ConfigParser$/,
+        "import sys\n" \
+        "sys.path.append(\"/usr/lib/openvpn/plugins/okta_openvpn\")\n" \
+        'import ConfigParser'
+      )
     end
     make
   end
@@ -74,7 +77,7 @@ class OktaOpenvpn < FPM::Cookery::Recipe
   def install
     make :install, DESTDIR: destdir
     pluginsdir = "#{destdir}/usr/lib/openvpn/plugins"
-    %w(M2Crypto urllib3 certifi).each do |m|
+    %w(typing M2Crypto urllib3 certifi).each do |m|
       safesystem("pip install --no-deps -U -t #{pluginsdir}/okta_openvpn " \
                  "--install-option='--install-lib=$base/lib/python' #{m}")
     end
