@@ -11,7 +11,7 @@ describe 'okta-openvpn::app' do
 
   %w(
     /etc/openvpn/okta_openvpn.ini
-    /usr/lib/openvpn/plugins/okta_openvpn.py
+    /usr/lib/openvpn/plugins/okta/okta_openvpn.py
   ).each do |f|
     describe file(f) do
       it 'exists' do
@@ -21,7 +21,7 @@ describe 'okta-openvpn::app' do
   end
 
   %w(M2Crypto urllib3 certifi).each do |d|
-    describe file(File.join('/usr/lib/openvpn/plugins/okta_openvpn', d)) do
+    describe file(File.join('/usr/lib/openvpn/plugins/okta', d)) do
       it 'exists' do
         expect(subject).to be_directory
       end
