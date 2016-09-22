@@ -23,6 +23,12 @@ describe 'okta-openvpn-build::_build' do
       expect(chef_run).to include_recipe('build-essential')
     end
 
+    %w(git python python-setuptools python-pip swig).each do |p|
+      it "installs #{p}" do
+        expect(chef_run).to install_package(p)
+      end
+    end
+
     it 'installs FPM Cookery' do
       expect(chef_run).to install_chef_gem('fpm-cookery')
         .with(compile_time: false)
@@ -56,6 +62,12 @@ describe 'okta-openvpn-build::_build' do
     it 'does not try to configure EPEL' do
       expect(chef_run).to_not include_recipe('yum-epel')
     end
+
+    %w(python-dev libssl-dev).each do |p|
+      it "installs #{p}" do
+        expect(chef_run).to install_package(p)
+      end
+    end
   end
 
   shared_examples_for 'a CentOS platform' do
@@ -65,6 +77,12 @@ describe 'okta-openvpn-build::_build' do
 
     it 'does not run the APT recipe' do
       expect(chef_run).to_not include_recipe('apt')
+    end
+
+    %w(python-devel openssl-devel rpm-build).each do |p|
+      it "installs #{p}" do
+        expect(chef_run).to install_package(p)
+      end
     end
   end
 
