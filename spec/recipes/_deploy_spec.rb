@@ -8,7 +8,8 @@ describe 'okta-openvpn-build::_deploy' do
   let(:runner) do
     ChefSpec::SoloRunner.new(platform) do |node|
       unless publish_artifacts.nil?
-        node.set['okta_openvpn_build']['publish_artifacts'] = publish_artifacts
+        k = 'okta_openvpn_build'
+        node.normal[k]['publish_artifacts'] = publish_artifacts
       end
     end
   end

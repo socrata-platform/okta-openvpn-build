@@ -8,8 +8,8 @@ describe 'okta-openvpn-build::_build' do
   let(:platform) { nil }
   let(:runner) do
     ChefSpec::SoloRunner.new(platform) do |node|
-      node.set['okta_openvpn_build']['version'] = version
-      node.set['okta_openvpn_build']['revision'] = revision
+      node.normal['okta_openvpn_build']['version'] = version
+      node.normal['okta_openvpn_build']['revision'] = revision
     end
   end
   let(:converge) { runner.converge(described_recipe) }
