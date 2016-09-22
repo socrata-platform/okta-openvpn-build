@@ -41,14 +41,14 @@ class OktaOpenvpn < FPM::Cookery::Recipe
   license 'Apache, version 2.0'
 
   build_deps = %w(git python python-setuptools python-pip swig)
-  deps = %w(python)
+  deps = %w(python openvpn)
 
-  platforms [:debian, :ubuntu] do
+  platforms %i(debian ubuntu) do
     build_depends build_deps + %w(python-dev libssl-dev)
     depends deps
   end
 
-  platforms [:redhat, :centos, :scientific] do
+  platforms %i(redhat centos scientific) do
     build_depends build_deps + %w(python-devel openssl-devel rpm-build)
     depends deps
   end
@@ -58,13 +58,14 @@ class OktaOpenvpn < FPM::Cookery::Recipe
   # plugin dependencies instead of looking in the normal Python paths.
   #
   def build
+    inline_replace 'Makefile' do |s|
+      s.gsub!('/lib/openvpn/plugins', '/lib/openvpn/plugins/okta')
+    end
     inline_replace 'okta_openvpn.py' do |s|
-      s.gsub!(
-        /^import ConfigParser$/,
-        "import sys\n" \
-        "sys.path.append(\"/usr/lib/openvpn/plugins/okta_openvpn\")\n" \
-        'import ConfigParser'
-      )
+      s.gsub!(/^import ConfigParser$/,
+              "import sys\n" \
+              "sys.path.append(\"/usr/lib/openvpn/plugins/okta\")\n" \
+              'import ConfigParser')
     end
     make
   end
@@ -78,12 +79,12 @@ class OktaOpenvpn < FPM::Cookery::Recipe
     make :install, DESTDIR: destdir
     pluginsdir = "#{destdir}/usr/lib/openvpn/plugins"
     %w(typing M2Crypto urllib3 certifi).each do |m|
-      safesystem("pip install --no-deps -U -t #{pluginsdir}/okta_openvpn " \
+      safesystem("pip install --no-deps -U -t #{pluginsdir}/okta " \
                  "--install-option='--install-lib=$base/lib/python' #{m}")
     end
-    f = File.open("#{pluginsdir}/okta_openvpn/__init__.py", 'w')
+    f = File.open("#{pluginsdir}/okta/__init__.py", 'w')
     f.write("__version__ = \"#{version}\"")
     f.close
-    safesystem("python -m compileall #{destdir}/usr/lib/openvpn/plugins")
+    safesystem("python -m compileall #{destdir}/usr/lib/openvpn/plugins/okta")
   end
 end
