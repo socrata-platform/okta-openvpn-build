@@ -23,7 +23,7 @@ describe 'okta-openvpn-build::_build' do
       expect(chef_run).to include_recipe('build-essential')
     end
 
-    %w(git python python-setuptools python-pip swig).each do |p|
+    %w(git python python-setuptools python-pip swig openvpn).each do |p|
       it "installs #{p}" do
         expect(chef_run).to install_package(p)
       end

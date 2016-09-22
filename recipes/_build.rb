@@ -38,6 +38,7 @@ deps = %w(
   python-setuptools
   python-pip
   swig
+  openvpn
 )
 deps += case node['platform_family']
         when 'debian'
