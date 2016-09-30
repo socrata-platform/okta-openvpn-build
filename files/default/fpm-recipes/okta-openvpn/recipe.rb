@@ -31,7 +31,7 @@ class OktaOpenvpn < FPM::Cookery::Recipe
 
   description 'The Okta plugin for OpenVPN'
   homepage 'https://github.com/okta/okta-openvpn'
-  source 'https://github.com/okta/okta-openvpn',
+  source 'https://github.com/socrata-platform/okta-openvpn',
          with: :git,
          tag: "v#{version}"
 

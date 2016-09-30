@@ -154,9 +154,8 @@ module OktaOpenvpnBuild
       #
       def tag
         @tag ||= JSON.parse(
-          Net::HTTP.get(
-            URI('https://api.github.com/repos/okta/okta-openvpn/tags')
-          )
+          Net::HTTP.get(URI('https://api.github.com/repos/socrata-platform/' \
+                            'okta-openvpn/tags'))
         ).first
       end
 

@@ -244,7 +244,7 @@ describe OktaOpenvpnBuild::Helpers do
 
     before(:each) do
       allow(Net::HTTP).to receive(:get).with(
-        URI('https://api.github.com/repos/okta/okta-openvpn/tags')
+        URI('https://api.github.com/repos/socrata-platform/okta-openvpn/tags')
       ).and_return(data)
     end
 
