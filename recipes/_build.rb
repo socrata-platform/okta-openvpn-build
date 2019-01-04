@@ -1,9 +1,10 @@
-# Encoding: UTF-8
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: okta-openvpn-build
 # Recipe:: _build
 #
-# Copyright 2016, Socrata, Inc.
+# Copyright 2016, Tyler Technologies
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,29 +23,27 @@ package 'okta-openvpn' do
   action :remove
 end
 
-apt_update 'default' if node['platform_family'] == 'debian'
-include_recipe 'yum-epel' if node['platform_family'] == 'rhel'
-include_recipe 'build-essential'
+apt_update 'default' if platform_family?('debian')
+include_recipe 'yum-epel' if platform_family?('rhel')
+build_essential
 
-chef_gem 'fpm-cookery' do
-  compile_time false
-end
+chef_gem 'fpm-cookery'
 
 # TODO: FPM Cookery's integration with Puppet to install the dependencies is
 # broken in Ruby 2.2+. See https://github.com/bernd/fpm-cookery/issues/154.
-deps = %w(
+deps = %w[
   git
   python
   python-setuptools
   python-pip
   swig
   openvpn
-)
+]
 deps += case node['platform_family']
         when 'debian'
-          %w(python-dev libssl-dev)
+          %w[python-dev libssl-dev]
         when 'rhel'
-          %w(python-devel openssl-devel rpm-build)
+          %w[python-devel openssl-devel rpm-build]
         end
 deps.each { |d| package d }
 
@@ -56,9 +55,9 @@ bash 'Run the FPM cook' do
     'BUILD_VERSION' => node['okta_openvpn_build']['version'],
     'BUILD_REVISION' => node['okta_openvpn_build']['revision'].to_s
   )
-  code <<-EOH.gsub(/^ {4}/, '')
+  code <<-CODE.gsub(/^ {4}/, '')
     BIN=/opt/chef/embedded/bin/fpm-cook
     $BIN clean
     $BIN package
-  EOH
+  CODE
 end

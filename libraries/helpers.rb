@@ -1,9 +1,10 @@
-# Encoding: UTF-8
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: okta-openvpn-build
 # Library:: helpers
 #
-# Copyright 2016, Socrata, Inc.
+# Copyright 2016, Tyler Technologies
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -105,7 +106,7 @@ module OktaOpenvpnBuild
           if token.nil? || packages.nil? || packages.empty?
             1
           else
-            packages.sort_by { |p| p['release'] }.last['release'].to_i + 1
+            packages.max_by { |p| p['release'] }['release'].to_i + 1
           end
         end
       end
