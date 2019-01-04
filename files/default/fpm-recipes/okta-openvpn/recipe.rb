@@ -1,8 +1,9 @@
-# Encoding: UTF-8
+# frozen_string_literal: true
+
 #
 # FPM Recipe:: okta-openvpn
 #
-# Copyright 2016, Socrata, Inc.
+# Copyright 2016, Tyler Technologies
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +23,7 @@ require 'fpm/cookery/recipe'
 
 # A FPM Cookery recipe for the Okta-OpenVPN plugin
 #
-# @author Jonathan Hartman <jonathan.hartman@socrata.com>
+# @author Jonathan Hartman <jonathan.hartman@tylertech.com>
 class OktaOpenvpn < FPM::Cookery::Recipe
   name 'okta-openvpn'
 
@@ -35,21 +36,21 @@ class OktaOpenvpn < FPM::Cookery::Recipe
          with: :git,
          tag: "v#{version}"
 
-  maintainer 'Jonathan Hartman <jonathan.hartman@socrata.com>'
-  vendor 'Socrata, Inc.'
+  maintainer 'Jonathan Hartman <jonathan.hartman@tylertech.com>'
+  vendor 'Tyler Technologies'
 
   license 'Apache, version 2.0'
 
-  build_deps = %w(git python python-setuptools python-pip swig)
-  deps = %w(python openvpn)
+  build_deps = %w[git python python-setuptools python-pip swig]
+  deps = %w[python openvpn]
 
-  platforms %i(debian ubuntu) do
-    build_depends build_deps + %w(python-dev libssl-dev)
+  platforms %i[debian ubuntu] do
+    build_depends build_deps + %w[python-dev libssl-dev]
     depends deps
   end
 
-  platforms %i(redhat centos scientific) do
-    build_depends build_deps + %w(python-devel openssl-devel rpm-build)
+  platforms %i[redhat centos scientific] do
+    build_depends build_deps + %w[python-devel openssl-devel rpm-build]
     depends deps
   end
 
@@ -77,7 +78,7 @@ class OktaOpenvpn < FPM::Cookery::Recipe
   #
   def install
     make :install, DESTDIR: destdir
-    %w(typing urllib3 certifi).each do |m|
+    %w[typing urllib3 certifi].each do |m|
       safesystem("pip install --no-deps -U -t #{pluginsdir}/okta #{m}")
     end
     # M2Crypto needs a little extra help to install without error
