@@ -52,7 +52,7 @@ describe OktaOpenvpnBuild::Helpers do
 
   describe '.package_file' do
     let(:platform) { nil }
-    let(:node) { Fauxhai.mock(platform).data }
+    let(:node) { Fauxhai.mock(platform: platform).data }
     let(:version) { '1.2.3' }
     let(:revision) { 4 }
 
@@ -78,26 +78,26 @@ describe OktaOpenvpnBuild::Helpers do
       end
     end
 
-    context 'Ubuntu 14.04' do
-      let(:platform) { { platform: 'ubuntu', version: '14.04' } }
+    context 'Ubuntu' do
+      let(:platform) { 'ubuntu' }
 
       it_behaves_like 'a debian platform'
     end
 
-    context 'Debian 9' do
-      let(:platform) { { platform: 'debian', version: '9' } }
+    context 'Debian' do
+      let(:platform) { 'debian' }
 
       it_behaves_like 'a debian platform'
     end
 
-    context 'RHEL 7' do
-      let(:platform) { { platform: 'redhat', version: '7' } }
+    context 'RHEL' do
+      let(:platform) { 'redhat' }
 
       it_behaves_like 'a rhel platform'
     end
 
-    context 'CentOS 7' do
-      let(:platform) { { platform: 'centos', version: '7' } }
+    context 'CentOS' do
+      let(:platform) { 'centos' }
 
       it_behaves_like 'a rhel platform'
     end

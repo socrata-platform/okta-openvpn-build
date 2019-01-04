@@ -41,16 +41,17 @@ class OktaOpenvpn < FPM::Cookery::Recipe
 
   license 'Apache, version 2.0'
 
-  build_deps = %w[git python python-setuptools python-pip swig]
+  build_deps = %w[git python python-setuptools swig]
   deps = %w[python openvpn]
 
   platforms %i[debian ubuntu] do
-    build_depends build_deps + %w[python-dev libssl-dev]
+    build_depends build_deps + %w[python-pip python-dev libssl-dev]
     depends deps
   end
 
   platforms %i[redhat centos scientific] do
-    build_depends build_deps + %w[python-devel openssl-devel rpm-build]
+    extras = %w[python2-pip python-devel openssl-devel rpm-build]
+    build_depends build_deps + extras
     depends deps
   end
 

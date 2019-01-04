@@ -15,3 +15,6 @@ issues_url 'https://github.com/socrata-platform/okta-openvpn-build/issues'
 depends 'yum-epel'
 
 supports 'ubuntu'
+supports 'redhat', '>= 7.0'
+supports 'centos', '>= 7.0'
+supports 'scientific', '>= 7.0'
