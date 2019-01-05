@@ -19,9 +19,10 @@ script: chef exec microwave test
 stages:
   - name: unit
   - name: test
-    if: NOT type = cron AND branch = master
+    if: NOT type = cron
 
 jobs:
   include:
     - stage: unit
       script: chef exec rake
+    - stage: test
