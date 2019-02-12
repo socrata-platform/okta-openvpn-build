@@ -4,19 +4,23 @@ branches:
   only:
   - master
 sudo: required
-env:
-  matrix:
-  - TYPE=default
-    PLATFORM=ubuntu
-  - TYPE=default
-    PLATFORM=centos
-  - TYPE=fips
-    PLATFORM=ubuntu
-  - TYPE=fips
-    PLATFORM=centos
+addons:
+  apt:
+    sources:
+    - chef-current-trusty
+    packages:
+    - chefdk
+services:
+- docker
 install:
-- curl https://omnitruck.chef.io/install.sh | sudo bash -s -- -c current -P chef-workstation
+- eval "$(chef shell-init bash)"
 - chef exec bundle install
+env:
+- PLATFORM=default-ubuntu
+- PLATFORM=default-centos
+- PLATFORM=fips-ubuntu
+- PLATFORM=fips-centos
+script: chef exec microwave test $PLATFORM
 stages:
 - name: unit
 - name: test
@@ -28,16 +32,13 @@ jobs:
     script: chef exec delivery local all
     env:
     - PLATFORM=none
-      TYPE=none
   - stage: test
-    script: chef exec microwave test $TYPE-$PLATFORM
   - &bintray-build-deploy-fips
     stage: publish fips
     script:
-    - chef exec kitchen test $TYPE-$PLATFORM
+    - chef exec kitchen test $PLATFORM
     env:
-    - PLATFORM=ubuntu
-      TYPE=fips
+    - PLATFORM=fips-ubuntu
     deploy:
       provider: bintray
       file: "./pkg/okta-openvpn-fips.json"
@@ -50,10 +51,9 @@ jobs:
   - <<: *bintray-build-deploy-fips
     stage: publish fips
     script:
-    - chef exec kitchen test $TYPE-$PLATFORM
+    - chef exec kitchen test $PLATFORM
     env:
-    - PLATFORM=centos
-      TYPE=fips
+    - PLATFORM=fips-centos
     deploy:
       provider: bintray
       file: "./pkg/okta-openvpn-fips.json"
