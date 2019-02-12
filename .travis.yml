@@ -1,27 +1,65 @@
 dist: xenial
 language: ruby
-
 branches:
   only:
-    - master
-
+  - master
 sudo: required
-
+env:
+  matrix:
+  - TYPE=default
+    PLATFORM=ubuntu
+  - TYPE=default
+    PLATFORM=centos
+  - TYPE=fips
+    PLATFORM=ubuntu
+  - TYPE=fips
+    PLATFORM=centos
 install:
-  - curl https://omnitruck.chef.io/install.sh | sudo bash -s -- -c current -P chefdk
-  - chef exec bundle install
-
-script: chef exec microwave test
-
-# The name "test" is special in Travis, so we have to call it that, even though
-# it'd be more accurately named "integration_test_and_deploy".
+- curl https://omnitruck.chef.io/install.sh | sudo bash -s -- -c current -P chefdk
+- chef exec bundle install
+script: chef exec microwave test $TYPE-$PLATFORM
 stages:
-  - name: unit
-  - name: test
-    if: NOT type = cron
-
+- name: unit
+- name: test
+  if: NOT type = cron
+- name: deploy
 jobs:
   include:
-    - stage: unit
-      script: chef exec rake
-    - stage: test
+  - stage: unit
+    script: chef exec delivery local all
+    env:
+    - PLATFORM=none
+      TYPE=none
+  - stage: test
+  - &bintray-build-deploy-fips
+    stage: publish fips
+    script:
+    - chef exec kitchen test $TYPE-$PLATFORM
+    env:
+    - PLATFORM=ubuntu
+      TYPE=fips
+    deploy:
+      provider: bintray
+      file: "./pkg/okta-openvpn-fips.json"
+      user: iamjohnnym
+      key:
+        secure: YkMRfzI0H+o1G2nPe7wAzTCG+EDJNarB/bXDvffMdEaX8boKjGvdMPlkySpvVMIj3VQGa5+bK15JbxNlXml0VM+qwb1FFYfbXD1yaIAqKupgDIxsUTwx8Cb7Vs7fKlhV1QHWCyvvnXkMYL0Hm3ug55TAXGPubStB5iaaJB0gWYdAQILOApeyuCovYr6LA9EP4zeVf5DOG7R3kYAVupQveWXBRC68q0PtXCiqbdgNcqh512emhYT0jJXDs64axowdFkWZIkjAS9Jv5BRp+reDvJnvFTEhvEBE5N2Xywr7LO1e+VmqddGILqAcn1RSmIbdhiHGeU995FEdsz+af23Iw4+CRnrJ+g5PUJdNkCR83T1jAW8IsYn+QpYrGsty3XDAt/4vGyq8mlCL93huxry8m3Mp+8SDlCq/uKgMwUhPDBgPwpK3zoXfVkA98g4tYO0NZVPlsn3ImSW+neLkQ2Q9jklElMWDUkLdLC6OtB/gGIUQeeWb3vMBnojKxlWtt6EN2YG+GC4Dir1qlPCAy4ztYdAu66aSBYX3N1X/BUm/BEXvASea8h+HwHQVRjjjHQzPmRYWuZY+HKMQcW8nK+tKBt85fD489VkIIqdOXyaT7z3gLXbnNWVOzXI8oDAFAewUFF/+VlrXLTz0tk1MHCucjzMqsv1Z+f46b8IYlN76vjE=
+      skip_cleanup: true
+      on:
+        branch: master
+  - <<: *bintray-build-deploy-fips
+    stage: publish fips
+    script:
+    - chef exec kitchen test $TYPE-$PLATFORM
+    env:
+    - PLATFORM=centos
+      TYPE=fips
+    deploy:
+      provider: bintray
+      file: "./pkg/okta-openvpn-fips.json"
+      user: iamjohnnym
+      key:
+        secure: YkMRfzI0H+o1G2nPe7wAzTCG+EDJNarB/bXDvffMdEaX8boKjGvdMPlkySpvVMIj3VQGa5+bK15JbxNlXml0VM+qwb1FFYfbXD1yaIAqKupgDIxsUTwx8Cb7Vs7fKlhV1QHWCyvvnXkMYL0Hm3ug55TAXGPubStB5iaaJB0gWYdAQILOApeyuCovYr6LA9EP4zeVf5DOG7R3kYAVupQveWXBRC68q0PtXCiqbdgNcqh512emhYT0jJXDs64axowdFkWZIkjAS9Jv5BRp+reDvJnvFTEhvEBE5N2Xywr7LO1e+VmqddGILqAcn1RSmIbdhiHGeU995FEdsz+af23Iw4+CRnrJ+g5PUJdNkCR83T1jAW8IsYn+QpYrGsty3XDAt/4vGyq8mlCL93huxry8m3Mp+8SDlCq/uKgMwUhPDBgPwpK3zoXfVkA98g4tYO0NZVPlsn3ImSW+neLkQ2Q9jklElMWDUkLdLC6OtB/gGIUQeeWb3vMBnojKxlWtt6EN2YG+GC4Dir1qlPCAy4ztYdAu66aSBYX3N1X/BUm/BEXvASea8h+HwHQVRjjjHQzPmRYWuZY+HKMQcW8nK+tKBt85fD489VkIIqdOXyaT7z3gLXbnNWVOzXI8oDAFAewUFF/+VlrXLTz0tk1MHCucjzMqsv1Z+f46b8IYlN76vjE=
+      skip_cleanup: true
+      on:
+        branch: master

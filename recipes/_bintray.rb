@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: okta-openvpn-build
-# Attributes:: default
+# Recipe:: _bintray
 #
 # Copyright 2016, Tyler Technologies
 #
@@ -19,10 +19,10 @@
 # limitations under the License.
 #
 
-default['okta_openvpn_build'].tap do |b|
-  b['publish_artifacts'] = false
-  b['fips_mode'] = false
-  b['packagecloud_token'] = nil
-  b['version'] = nil
-  b['revision'] = nil
+template '/tmp/fpm-recipes/okta-openvpn/pkg/okta-openvpn-fips.json' do
+  source 'bintray.erb'
+  owner 'root'
+  group 'root'
+  mode '0755'
+  only_if { node['okta_openvpn_build']['publish_artifacts'] }
 end

@@ -1,12 +1,29 @@
+---
 <%
-require_relative 'libraries/helpers'
-OktaOpenvpnBuild::Helpers.configure!(token: ENV['PACKAGECLOUD_TOKEN'])
+  require_relative 'libraries/helpers'
+  OktaOpenvpnBuild::Helpers.configure!(
+    token: ENV['PACKAGECLOUD_TOKEN'])
 %>
 
+driver:
+  name: dokken
+  privileged: true
+  binds:
+  - <%= File.expand_path('pkg') %>:/tmp/fpm-recipes/okta-openvpn/pkg
+
 suites:
-  - name: default
-    run_list: okta-openvpn-build::default
-    attributes:
+- name: fips
+  run_list:
+  - recipe[okta-openvpn-build::fips]
+  attributes:
+      okta_openvpn_build:
+        version: <%= OktaOpenvpnBuild::Helpers.version %>
+        revision: <%= OktaOpenvpnBuild::Helpers.revision %>
+        publish_artifacts: <%= ENV['TRAVIS_PULL_REQUEST'] == 'false' ? true : false %>
+- name: default
+  run_list:
+  - recipe[okta-openvpn-build::default]
+  attributes:
       okta_openvpn_build:
         version: <%= OktaOpenvpnBuild::Helpers.version %>
         revision: <%= OktaOpenvpnBuild::Helpers.revision %>

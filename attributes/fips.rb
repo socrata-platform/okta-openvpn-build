@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: okta-openvpn-build
-# Attributes:: default
+# Attributes:: fips
 #
 # Copyright 2016, Tyler Technologies
 #
@@ -20,9 +20,5 @@
 #
 
 default['okta_openvpn_build'].tap do |b|
-  b['publish_artifacts'] = false
-  b['fips_mode'] = false
-  b['packagecloud_token'] = nil
-  b['version'] = nil
-  b['revision'] = nil
+  b['fips_mode'] = true
 end

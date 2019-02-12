@@ -2,7 +2,7 @@
 
 require_relative '../spec_helper'
 
-describe 'okta-openvpn-build::_deploy' do
+describe 'okta-openvpn-build::_soundcloud' do
   platform 'ubuntu'
 
   shared_examples_for 'any attribute set' do

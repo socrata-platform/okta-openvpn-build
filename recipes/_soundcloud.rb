@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: okta-openvpn-build
-# Attributes:: default
+# Recipe:: _soundcloud
 #
 # Copyright 2016, Tyler Technologies
 #
@@ -19,10 +19,12 @@
 # limitations under the License.
 #
 
-default['okta_openvpn_build'].tap do |b|
-  b['publish_artifacts'] = false
-  b['fips_mode'] = false
-  b['packagecloud_token'] = nil
-  b['version'] = nil
-  b['revision'] = nil
+chef_gem 'packagecloud-ruby'
+
+ruby_block 'Push artifacts to PackageCloud' do
+  block do
+    OktaOpenvpnBuild::Helpers.push_package!
+  end
+
+  only_if { node['okta_openvpn_build']['publish_artifacts'] }
 end

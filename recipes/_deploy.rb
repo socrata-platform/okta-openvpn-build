@@ -19,12 +19,8 @@
 # limitations under the License.
 #
 
-chef_gem 'packagecloud-ruby'
-
-ruby_block 'Push artifacts to PackageCloud' do
-  block do
-    OktaOpenvpnBuild::Helpers.push_package!
-  end
-
-  only_if { node['okta_openvpn_build']['publish_artifacts'] }
+if node['okta_openvpn_build']['fips_mode']
+  include_recipe "#{cookbook_name}::_bintray"
+else
+  include_recipe "#{cookbook_name}::_soundcloud"
 end

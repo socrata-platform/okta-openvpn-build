@@ -1,27 +1,10 @@
 # frozen_string_literal: true
 
-source 'https://rubygems.org'
-
-group :test do
-  gem 'chefspec'
-  gem 'fauxhai'
-  gem 'foodcritic'
-  gem 'rake'
-  gem 'rspec'
-  gem 'rubocop'
-  gem 'simplecov'
-  gem 'simplecov-console'
-end
-
-group :integration do
-  gem 'serverspec'
-end
+require 'open-uri'
+instance_eval(open('https://raw.githubusercontent.com/socrata-cookbooks/' \
+                   'shared/master/files/Gemfile').read)
 
 group :build do
-  gem 'berkshelf'
-  gem 'chef', '>= 14.0'
   gem 'fpm-cookery'
-  gem 'kitchen-microwave'
   gem 'packagecloud-ruby', '~> 1.0'
-  gem 'test-kitchen'
 end
