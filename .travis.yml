@@ -1,4 +1,3 @@
-dist: xenial
 language: ruby
 branches:
   only:
