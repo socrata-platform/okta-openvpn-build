@@ -17,7 +17,6 @@ env:
 install:
 - curl https://omnitruck.chef.io/install.sh | sudo bash -s -- -c current -P chefdk
 - chef exec bundle install
-script: chef exec microwave test $TYPE-$PLATFORM
 stages:
 - name: unit
 - name: test
@@ -31,6 +30,7 @@ jobs:
     - PLATFORM=none
       TYPE=none
   - stage: test
+    script: chef exec microwave test $TYPE-$PLATFORM
   - &bintray-build-deploy-fips
     stage: publish fips
     script:
